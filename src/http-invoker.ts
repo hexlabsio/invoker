@@ -28,4 +28,11 @@ const httpInvoker: Caller = { call: async (
   };
 } };
 
+export function httpUrlInvoker(url: string): Caller {
+  return {
+    call: (method: any, resource: any, path: string, body: any, pathParameters: any, queryParameters: any, multiQueryParameters: any, headers: any) =>
+      httpInvoker.call(method, resource, path, body, pathParameters, queryParameters, multiQueryParameters, headers, url)
+  }
+}
+
 export default httpInvoker
