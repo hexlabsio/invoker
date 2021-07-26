@@ -1,10 +1,11 @@
 import {Caller} from "./caller";
 import {Lambda} from 'aws-sdk';
-import {APIGatewayProxyResult} from 'aws-lambda';
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
 
-function lambdaInvoker(arn: string, lambda: Lambda): Caller {
+function lambdaApiInvoker(arn: string, lambda: Lambda, transform: (request: APIGatewayProxyEvent) => APIGatewayProxyEvent = r => r): Caller {
   return { call: (async (method, resource, path, body, pathParameters, queryParameters, headers) => {
-      const result = await lambda.invoke({FunctionName: arn, InvocationType: 'RequestResponse', Payload: JSON.stringify({ httpMethod: method, resource, path, body: body ?? null, pathParameters: pathParameters as any, headers, queryStringParameters: queryParameters})}).promise();
+      const request = transform({ httpMethod: method, resource, path, body: body ?? null, pathParameters: pathParameters as any, headers: headers as any, queryStringParameters: queryParameters} as APIGatewayProxyEvent);
+      const result = await lambda.invoke({FunctionName: arn, InvocationType: 'RequestResponse', Payload: JSON.stringify(request)}).promise();
       if(result.StatusCode! >= 200 && result.StatusCode! < 300) {
         const response: APIGatewayProxyResult = JSON.parse(result.Payload!.toString());
         return {statusCode: response.statusCode, body: response.body, headers: response.headers as any };
@@ -13,4 +14,4 @@ function lambdaInvoker(arn: string, lambda: Lambda): Caller {
     }) };
 }
 
-export default lambdaInvoker;
+export default lambdaApiInvoker;
