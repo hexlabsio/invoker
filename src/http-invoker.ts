@@ -2,7 +2,7 @@ import axios from "axios";
 import {Caller} from "./caller";
 import qs from 'query-string';
 
-const httpInvoker: Caller = { call: async (
+export const httpInvoker: Caller = { call: async (
   method: any,
   resource: any,
   path: string,
@@ -35,4 +35,4 @@ export function httpUrlInvoker(url: string): Caller {
   }
 }
 
-export default httpInvoker
+
