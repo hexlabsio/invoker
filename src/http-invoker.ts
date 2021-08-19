@@ -14,6 +14,8 @@ export const httpInvoker: Caller = { call: async (
   url: string
 ) => {
   const result = await axios(url + path, {
+    maxRedirects: 0,
+    validateStatus: (status => status < 400),
     method: method as any,
     data: body,
     paramsSerializer: (params) => qs.stringify(params),
